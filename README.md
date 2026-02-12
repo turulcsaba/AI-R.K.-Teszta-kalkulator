@@ -1,4 +1,5 @@
-AI recept kártya – A Te digitális péksegéded
+​AI recept kártya tészta kalkulátor!!!
+
 ​Ez egy okos kis eszköz, amit azért készítettem, hogy megkönnyítsem neked a sütést. Nem csak egy weboldal: ha kirakod a telefonod kezdőképernyőjére, úgy használhatod, mint egy rendes alkalmazást – akár internet nélkül is.
 ​🌟 Miben segítek neked?
 ​Kovászos kenyér: Megmondom, mennyi liszt és víz kell a tésztádba, és a kinti hőmérséklet alapján javaslatot teszek, mennyi kovászt használj.
