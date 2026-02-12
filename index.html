@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Recept Központ</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; margin: 0; padding: 15px; }
+        .app-header { text-align: center; color: #d84315; margin-bottom: 20px; }
+        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; border-left: 5px solid #d84315; }
+        h2 { color: #d84315; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; font-size: 18px; }
+        .input-group { margin-bottom: 12px; }
+        label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #444; }
+        input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; background: #fafafa; }
+        .calc-btn { width: 100%; padding: 15px; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; transition: 0.3s; }
+        .btn-save { background: #2e7d32; margin-bottom: 15px; }
+        .btn-kovasz { background: #5d4037; } .btn-eleszto { background: #1976d2; } .btn-pizza { background: #e64a19; }
+        .res { margin-top: 15px; background: #fffde7; padding: 15px; border-radius: 10px; border: 1px solid #ffe082; display: none; }
+        .res p { margin: 8px 0; font-size: 16px; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(0,0,0,0.05); }
+        .total-box { background: #d84315; color: white; padding: 12px; border-radius: 8px; margin-top: 15px; text-align: center; font-weight: bold; font-size: 18px; }
+        .pre-box { background: #e3f2fd; border: 1px solid #bbdefb; padding: 10px; border-radius: 8px; margin-bottom: 10px; color: #0d47a1; font-size: 14px; }
+        .temp-info { font-style: italic; color: #d84315; font-size: 12px; margin-bottom: 5px; }
+        .link-item { background: #f9f9f9; padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #ddd; }
+        .link-item a { color: #1976d2; text-decoration: none; font-weight: bold; max-width: 70%; overflow: hidden; }
+        b { color: #000; }
+    </style>
+</head>
+<body>
+
+<div class="app-header"><h1>AI Recept Központ</h1></div>
+
+<button class="calc-btn btn-save" onclick="saveAll()">MINDEN MENTÉSE</button>
+
+<div class="card">
+    <h2>🥖 Kovászos Kenyér</h2>
+    <div class="input-group">
+        <label>Hőmérséklet (°C):</label>
+        <input type="number" id="k_temp" value="24" oninput="updateKovRec()">
+        <div id="k_msg" class="temp-info">Ajánlott kovász: 20%</div>
+    </div>
+    <div class="input-group"><label>Összsúly (g):</label><input type="number" id="k_target" value="1150"></div>
+    <div class="input-group"><label>Hidratálás (%):</label><input type="number" id="k_hyd" value="70"></div>
+    <div class="input-group"><label>Kovász arány (%):</label><input type="number" id="k_ratio" value="20"></div>
+    <button class="calc-btn btn-kovasz" onclick="calcKovasz()">SZÁMÍTÁS</button>
+    <div id="k_res" class="res"></div>
+</div>
+
+<div class="card">
+    <h2>🍞 Kovászolt (Fix Előtészta)</h2>
+    <div class="input-group"><label>Összsúly (g):</label><input type="number" id="e_target" value="3600"></div>
+    <div class="input-group"><label>Hidratálás (%):</label><input type="number" id="e_hyd" value="65"></div>
+    <button class="calc-btn btn-eleszto" onclick="calcKovaszolt()">SZÁMÍTÁS</button>
+    <div id="e_res" class="res"></div>
+</div>
+
+<div class="card">
+    <h2>🍕 Pizza (Poolish)</h2>
+    <div class="input-group"><label>Gombóc (db):</label><input type="number" id="p_db" value="4"></div>
+    <div class="input-group"><label>Súly (g):</label><input type="number" id="p_suly" value="250"></div>
+    <div class="input-group"><label>Só (%):</label><input type="number" id="p_salt" value="2.5" step="0.1"></div>
+    <button class="calc-btn btn-pizza" onclick="calcPizza()">SZÁMÍTÁS</button>
+    <div id="p_res" class="res"></div>
+</div>
+
+<div class="card">
+    <h2>🔗 Linkek</h2>
+    <div id="link-list"></div>
+    <input type="text" id="l_name" placeholder="Név" style="margin-top:10px">
+    <input type="text" id="l_url" placeholder="URL">
+    <button class="calc-btn" style="background:#455a64" onclick="addLink()">HOZZÁADÁS</button>
+</div>
+
+<script>
+let links = JSON.parse(localStorage.getItem('bLinks')) || [];
+
+function saveAll() {
+    document.querySelectorAll('input:not([id^="l_"])').forEach(i => localStorage.setItem('b_'+i.id, i.value));
+    localStorage.setItem('bLinks', JSON.stringify(links));
+    alert('Sikeresen mentve!');
+}
+
+function loadAll() {
+    document.querySelectorAll('input:not([id^="l_"])').forEach(i => {
+        let v = localStorage.getItem('b_'+i.id);
+        if(v) i.value = v;
+    });
+    renderLinks();
+}
+
+function addLink() {
+    let n = document.getElementById('l_name').value;
+    let u = document.getElementById('l_url').value;
+    if(n && u) {
+        links.push({n, u: u.startsWith('http') ? u : 'https://' + u});
+        document.getElementById('l_name').value = ''; document.getElementById('l_url').value = '';
+        renderLinks();
+    }
+}
+
+function renderLinks() {
+    document.getElementById('link-list').innerHTML = links.map((l, i) => `
+        <div class="link-item">
+            <a href="${l.u}" target="_blank">📺 ${l.n}</a>
+            <button onclick="links.splice(${i},1);renderLinks()" style="color:red;border:none;background:none">X</button>
+        </div>`).join('');
+}
+
+function updateKovRec() {
+    let t = parseFloat(document.getElementById('k_temp').value);
+    let r = (t <= 20) ? 30 : (t <= 22) ? 25 : (t <= 25) ? 20 : (t <= 28) ? 15 : 10;
+    document.getElementById('k_msg').innerText = "Ajánlott kovász: " + r + "%";
+    document.getElementById('k_ratio').value = r;
+}
+
+function calcKovasz() {
+    let w = parseFloat(document.getElementById('k_target').value);
+    let h = parseFloat(document.getElementById('k_hyd').value)/100;
+    let r = parseFloat(document.getElementById('k_ratio').value)/100;
+    let tL = w / (1 + h + 0.022);
+    let kL = tL * r; let kV = kL; // 100% hidro
+    document.getElementById('k_res').innerHTML = `
+        <div class="pre-box">KOVÁSZ: L: ${Math.round(kL)}g | V: ${Math.round(kV)}g</div>
+        <p>Liszt: <b>${Math.round(tL-kL)} g</b></p>
+        <p>Víz: <b>${Math.round((tL*h)-kV)} g</b></p>
+        <p>Só (2.2%): <b>${Math.round(tL*0.022)} g</b></p>
+        <div class="total-box">Összesen: ${Math.round(w)}g</div>`;
+    document.getElementById('k_res').style.display = 'block';
+}
+
+function calcKovaszolt() {
+    let w = parseFloat(document.getElementById('e_target').value);
+    let h = parseFloat(document.getElementById('e_hyd').value)/100;
+    let tL = (w - (w * (5.5/3600))) / (1 + h + 0.022);
+    document.getElementById('e_res').innerHTML = `
+        <div class="pre-box">ELŐTÉSZTA: 330g L | 330g V | 2g É</div>
+        <p>Liszt: <b>${Math.round(tL-330)} g</b></p>
+        <p>Víz: <b>${Math.round((tL*h)-330)} g</b></p>
+        <p>Élesztő: <b>${(w*(5.5/3600)-2).toFixed(2)} g</b></p>
+        <div class="total-box">Összesen: ${Math.round(w)}g</div>`;
+    document.getElementById('e_res').style.display = 'block';
+}
+
+function calcPizza() {
+    let db = parseFloat(document.getElementById('p_db').value);
+    let s = parseFloat(document.getElementById('p_suly').value);
+    let w = db * s;
+    let h = 0.65; let sP = parseFloat(document.getElementById('p_salt').value)/100;
+    let tL = w / (1 + h + sP + 0.0034);
+    let pL = tL * 0.33; let tE = tL * 0.0034;
+    document.getElementById('p_res').innerHTML = `
+        <div class="pre-box">POOLISH: L: ${Math.round(pL)}g | V: ${Math.round(pL)}g</div>
+        <p>Liszt: <b>${Math.round(tL-pL)} g</b></p>
+        <p>Víz: <b>${Math.round((tL*h)-pL)} g</b></p>
+        <p>Élesztő: <b>${(tE - (tL*0.0025)).toFixed(2)} g</b></p>
+        <div class="total-box">Összesen: ${Math.round(w)}g</div>`;
+    document.getElementById('p_res').style.display = 'block';
+}
+
+window.onload = loadAll;
+</script>
+</body>
+</html>
