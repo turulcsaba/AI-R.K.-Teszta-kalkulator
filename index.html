@@ -2,53 +2,100 @@
 <html lang="hu">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Recept Központ</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Tészta Kalkulátor 2.0 V</title>
     <style>
-        body { font-family: 'Segoe UI', sans-serif; background: #f4f4f4; margin: 0; padding: 15px; }
-        .app-header { text-align: center; color: #d84315; margin-bottom: 20px; }
-        .card { background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); margin-bottom: 20px; border-left: 5px solid #d84315; }
-        h2 { color: #d84315; border-bottom: 2px solid #eee; padding-bottom: 10px; margin-top: 0; font-size: 18px; }
-        .input-group { margin-bottom: 12px; }
-        label { display: block; font-size: 13px; font-weight: bold; margin-bottom: 5px; color: #444; }
-        input { width: 100%; padding: 12px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; font-size: 16px; background: #fafafa; }
-        .calc-btn { width: 100%; padding: 15px; border: none; border-radius: 8px; color: white; font-weight: bold; font-size: 16px; cursor: pointer; margin-top: 10px; transition: 0.3s; }
-        .btn-save { background: #2e7d32; margin-bottom: 15px; }
-        .btn-kovasz { background: #5d4037; } .btn-eleszto { background: #1976d2; } .btn-pizza { background: #e64a19; }
-        .res { margin-top: 15px; background: #fffde7; padding: 15px; border-radius: 10px; border: 1px solid #ffe082; display: none; }
-        .res p { margin: 8px 0; font-size: 16px; display: flex; justify-content: space-between; border-bottom: 1px solid rgba(0,0,0,0.05); }
-        .total-box { background: #d84315; color: white; padding: 12px; border-radius: 8px; margin-top: 15px; text-align: center; font-weight: bold; font-size: 18px; }
-        .pre-box { background: #e3f2fd; border: 1px solid #bbdefb; padding: 10px; border-radius: 8px; margin-bottom: 10px; color: #0d47a1; font-size: 14px; }
-        .temp-info { font-style: italic; color: #d84315; font-size: 12px; margin-bottom: 5px; }
-        .link-item { background: #f9f9f9; padding: 10px; border-radius: 8px; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid #ddd; }
-        .link-item a { color: #1976d2; text-decoration: none; font-weight: bold; max-width: 70%; overflow: hidden; }
-        b { color: #000; }
+        :root { --primary: #d84315; --bg: #f4f4f4; --card: #ffffff; --text: #000000; --spec: #4527a0; --info: #0277bd; }
+        body { font-family: 'Roboto', sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
+        .app-header { text-align: center; padding: 15px 0; background: var(--primary); color: white; border-radius: 0 0 15px 15px; margin: -10px -10px 20px -10px; box-shadow: 0 2px 5px rgba(0,0,0,0.2); }
+        .app-header h1 { margin: 0; font-size: 22px; text-transform: uppercase; letter-spacing: 1px; }
+        .card { background: var(--card); padding: 15px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 15px; border: 1px solid #e0e0e0; }
+        h2 { color: var(--primary); margin-top: 0; font-size: 18px; border-bottom: 2px solid #eee; padding-bottom: 5px; }
+        .spec-h2 { color: var(--spec); }
+        .input-group { margin-bottom: 10px; }
+        label { display: block; font-size: 12px; font-weight: bold; margin-bottom: 4px; color: #555; }
+        input, textarea { width: 100%; padding: 10px; border: 1px solid #bbb; border-radius: 6px; font-size: 16px; outline: none; box-sizing: border-box; color: #000; background: #fff; }
+        .calc-btn { width: 100%; padding: 12px; border: none; border-radius: 6px; color: white; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: 5px; text-transform: uppercase; }
+        .btn-save { background: #2e7d32; margin-bottom: 15px; box-shadow: 0 3px 0 #1b5e20; }
+        .btn-kovasz { background: #5d4037; } 
+        .btn-eleszto { background: #1565c0; } 
+        .btn-pizza { background: #bf360c; }
+        .btn-spec { background: var(--spec); }
+        .res { margin-top: 12px; background: #fffde7; padding: 12px; border-radius: 8px; border: 1px solid #ffd54f; display: none; }
+        .res p { margin: 6px 0; font-size: 15px; display: flex; justify-content: space-between; color: #000; font-weight: 600; border-bottom: 1px solid #eee; }
+        .total-box { background: #333; color: #fff; padding: 10px; border-radius: 6px; margin-top: 10px; text-align: center; font-weight: bold; }
+        .pre-box { background: #e3f2fd; border-left: 4px solid #1976d2; padding: 8px; border-radius: 4px; margin-bottom: 10px; color: #0d47a1; font-weight: bold; font-size: 13px; }
+        .info-box { background: #fff; border: 2px solid var(--info); padding: 12px; border-radius: 8px; margin-top: 15px; }
+        #kisokos_text { background: #f9f9f9; border: 1px solid #000; font-size: 14px; font-weight: 900; line-height: 1.5; color: #000; height: 300px; resize: none; }
+        .link-item { background: #fff; padding: 10px; border-radius: 6px; margin-bottom: 5px; display: flex; justify-content: space-between; border: 1px solid #ddd; align-items: center; }
     </style>
 </head>
 <body>
 
-<div class="app-header"><h1>AI Recept Központ</h1></div>
+<div class="app-header"><h1>Tészta Kalkulátor 2.0 V</h1></div>
 
-<button class="calc-btn btn-save" onclick="saveAll()">MINDEN MENTÉSE</button>
+<button class="calc-btn btn-save" onclick="saveData()">💾 ADATOK MENTÉSE</button>
+
+<div class="card" style="border: 2px solid var(--spec);">
+    <h2 class="spec-h2">🧪 Speciális Liszt & Keverő</h2>
+    <div class="input-group">
+        <label>Fehérje (%) vagy W érték:</label>
+        <div style="display:flex; gap:8px;">
+            <input type="number" id="s_prot" step="0.1" placeholder="Fehérje">
+            <input type="number" id="s_w_input" placeholder="W érték">
+        </div>
+        <button class="calc-btn btn-spec" onclick="calcSpec()">ELEMZÉS</button>
+        <div id="s_res" class="res" style="background:#f3e5f5; border-color:#b39ddb;"></div>
+    </div>
+
+    <div style="margin-top:15px; padding-top:15px; border-top: 1px dashed #ccc;">
+        <label>Liszt Keverés (Pearson-négyzet):</label>
+        <div class="input-group"><input type="number" id="mix_total" placeholder="Teljes mennyiség (g)" value="600"></div>
+        <div class="input-group"><input type="number" id="mix_target" placeholder="Kívánt cél W érték"></div>
+        <div style="display:flex; gap:8px;">
+            <div style="flex:1;"><label>Liszt 1 W:</label><input type="number" id="mix_w1" placeholder="Gyengébb"></div>
+            <div style="flex:1;"><label>Liszt 2 W:</label><input type="number" id="mix_w2" placeholder="Erősebb"></div>
+        </div>
+        <button class="calc-btn btn-spec" style="background:#311b92;" onclick="calcMix()">ARÁNYOK KISZÁMÍTÁSA</button>
+        <div id="mix_res" class="res" style="background:#f3e5f5; border-color:#b39ddb;"></div>
+    </div>
+
+    <div class="info-box">
+        <h3 style="margin:0 0 10px 0; color:#000; font-size:16px; text-decoration:underline; text-align:center;">📖 Pék Kisokos & Útmutató</h3>
+        <textarea id="kisokos_text">
+W90-160: Gyenge (keksz)
+W160-250: Közepes (kenyér, pizza)
+W250-310: Erős (hosszú kelés)
+9.8% Protein: ~W190-210 (Hidro: 65-68%)
+Autolízis: Erős lisztnél 30-60 perc javasolt.
+
+------------------
+
+Hogyan működik a liszt W kalkulátor?
+Írd be a „Teljes lisztmennyiség” sávba azt a mennyiséget, amellyel a tésztakészítés során számolsz.
+Írd be a „Kívánt W érték” sávba azt a W-t, amit el szeretnél érni.
+Írd be a „Liszt 1 W” és „Liszt 2 W” értékeket.
+Kattints a számításra a pontos grammokért.
+        </textarea>
+    </div>
+</div>
 
 <div class="card">
     <h2>🥖 Kovászos Kenyér</h2>
-    <div class="input-group">
-        <label>Hőmérséklet (°C):</label>
-        <input type="number" id="k_temp" value="24" oninput="updateKovRec()">
-        <div id="k_msg" class="temp-info">Ajánlott kovász: 20%</div>
-    </div>
-    <div class="input-group"><label>Összsúly (g):</label><input type="number" id="k_target" value="1150"></div>
-    <div class="input-group"><label>Hidratálás (%):</label><input type="number" id="k_hyd" value="70"></div>
-    <div class="input-group"><label>Kovász arány (%):</label><input type="number" id="k_ratio" value="20"></div>
+    <div class="input-group"><label>Összsúly (g):</label><input type="number" id="k_target" value="1325"></div>
+    <div class="input-group"><label>Hidratálás (%):</label><input type="number" id="k_hyd" value="68"></div>
+    <div class="input-group"><label>Krumpli (g):</label><input type="number" id="k_pot" value="150"></div>
+    <div class="input-group"><label>Külső hőmérséklet (°C):</label><input type="number" id="k_temp" value="22"></div>
     <button class="calc-btn btn-kovasz" onclick="calcKovasz()">SZÁMÍTÁS</button>
     <div id="k_res" class="res"></div>
 </div>
 
 <div class="card">
-    <h2>🍞 Kovászolt (Fix Előtészta)</h2>
-    <div class="input-group"><label>Összsúly (g):</label><input type="number" id="e_target" value="3600"></div>
+    <h2>🍞 Kovászolt (Poolish)</h2>
+    <div class="input-group"><label>Összsúly (g):</label><input type="number" id="e_target" value="1150"></div>
     <div class="input-group"><label>Hidratálás (%):</label><input type="number" id="e_hyd" value="65"></div>
+    <div class="input-group"><label>Krumpli (g):</label><input type="number" id="e_pot" value="150"></div>
+    <div class="input-group"><label>Só (%):</label><input type="number" id="e_salt" value="2.5"></div>
     <button class="calc-btn btn-eleszto" onclick="calcKovaszolt()">SZÁMÍTÁS</button>
     <div id="e_res" class="res"></div>
 </div>
@@ -56,107 +103,97 @@
 <div class="card">
     <h2>🍕 Pizza (Poolish)</h2>
     <div class="input-group"><label>Gombóc (db):</label><input type="number" id="p_db" value="4"></div>
-    <div class="input-group"><label>Súly (g):</label><input type="number" id="p_suly" value="250"></div>
-    <div class="input-group"><label>Só (%):</label><input type="number" id="p_salt" value="2.5" step="0.1"></div>
+    <div class="input-group"><label>Súly / gombóc (g):</label><input type="number" id="p_suly" value="250"></div>
+    <div class="input-group"><label>Só (%):</label><input type="number" id="p_salt" value="2.5"></div>
+    <div class="input-group"><label>Olívaolaj (g):</label><input type="number" id="p_oil" value="10"></div>
     <button class="calc-btn btn-pizza" onclick="calcPizza()">SZÁMÍTÁS</button>
     <div id="p_res" class="res"></div>
 </div>
 
 <div class="card">
-    <h2>🔗 Linkek</h2>
+    <h2>🔗 Recept Linkek</h2>
     <div id="link-list"></div>
-    <input type="text" id="l_name" placeholder="Név" style="margin-top:10px">
+    <input type="text" id="l_name" placeholder="Recept neve" style="margin-bottom:5px;">
     <input type="text" id="l_url" placeholder="URL">
-    <button class="calc-btn" style="background:#455a64" onclick="addLink()">HOZZÁADÁS</button>
+    <button class="calc-btn" style="background:#555" onclick="addLink()">LISTÁHOZ ADÁS</button>
 </div>
 
 <script>
-let links = JSON.parse(localStorage.getItem('bLinks')) || [];
+let links = JSON.parse(localStorage.getItem('v2_bakery_links')) || [];
+function getN(id) { return parseFloat(document.getElementById(id).value) || 0; }
 
-function saveAll() {
-    document.querySelectorAll('input:not([id^="l_"])').forEach(i => localStorage.setItem('b_'+i.id, i.value));
-    localStorage.setItem('bLinks', JSON.stringify(links));
-    alert('Sikeresen mentve!');
-}
-
-function loadAll() {
-    document.querySelectorAll('input:not([id^="l_"])').forEach(i => {
-        let v = localStorage.getItem('b_'+i.id);
-        if(v) i.value = v;
-    });
-    renderLinks();
-}
-
-function addLink() {
-    let n = document.getElementById('l_name').value;
-    let u = document.getElementById('l_url').value;
-    if(n && u) {
-        links.push({n, u: u.startsWith('http') ? u : 'https://' + u});
-        document.getElementById('l_name').value = ''; document.getElementById('l_url').value = '';
-        renderLinks();
+function calcSpec() {
+    let prot = getN('s_prot'), w = getN('s_w_input'), res = document.getElementById('s_res');
+    if (prot > 0 && w === 0) {
+        if (prot < 9.5) w = 150; else if (prot <= 10.5) w = 210; else if (prot < 12.5) w = 290; else w = 380;
     }
+    let hyd = (w < 220) ? "63-68%" : (w < 320) ? "68-75%" : "75-85%";
+    res.innerHTML = `<p>Becsült erő: <span>W ${w}</span></p><p>Ajánlott víz: <span>${hyd}</span></p>`;
+    res.style.display = 'block';
 }
 
-function renderLinks() {
-    document.getElementById('link-list').innerHTML = links.map((l, i) => `
-        <div class="link-item">
-            <a href="${l.u}" target="_blank">📺 ${l.n}</a>
-            <button onclick="links.splice(${i},1);renderLinks()" style="color:red;border:none;background:none">X</button>
-        </div>`).join('');
-}
-
-function updateKovRec() {
-    let t = parseFloat(document.getElementById('k_temp').value);
-    let r = (t <= 20) ? 30 : (t <= 22) ? 25 : (t <= 25) ? 20 : (t <= 28) ? 15 : 10;
-    document.getElementById('k_msg').innerText = "Ajánlott kovász: " + r + "%";
-    document.getElementById('k_ratio').value = r;
+function calcMix() {
+    let total = getN('mix_total'), target = getN('mix_target'), w1 = getN('mix_w1'), w2 = getN('mix_w2');
+    let res = document.getElementById('mix_res');
+    if (target <= Math.min(w1, w2) || target >= Math.max(w1, w2)) { alert("Hiba: Cél W-nek a kettő közé kell esnie!"); return; }
+    let q2 = total * (target - w1) / (w2 - w1);
+    let q1 = total - q2;
+    res.innerHTML = `<p>Liszt 1 (gyengébb): <span>${Math.round(q1)}g</span></p><p>Liszt 2 (erősebb): <span>${Math.round(q2)}g</span></p>`;
+    res.style.display = 'block';
 }
 
 function calcKovasz() {
-    let w = parseFloat(document.getElementById('k_target').value);
-    let h = parseFloat(document.getElementById('k_hyd').value)/100;
-    let r = parseFloat(document.getElementById('k_ratio').value)/100;
-    let tL = w / (1 + h + 0.022);
-    let kL = tL * r; let kV = kL; // 100% hidro
-    document.getElementById('k_res').innerHTML = `
-        <div class="pre-box">KOVÁSZ: L: ${Math.round(kL)}g | V: ${Math.round(kV)}g</div>
-        <p>Liszt: <b>${Math.round(tL-kL)} g</b></p>
-        <p>Víz: <b>${Math.round((tL*h)-kV)} g</b></p>
-        <p>Só (2.2%): <b>${Math.round(tL*0.022)} g</b></p>
-        <div class="total-box">Összesen: ${Math.round(w)}g</div>`;
+    let w = getN('k_target'), h = getN('k_hyd')/100, pot = getN('k_pot'), temp = getN('k_temp');
+    let scale = w / (600 + 150 + pot + 15 + (600 * h));
+    let t_viz = (temp > 25) ? "Hűtőhideg" : (temp < 20) ? "Langyos (30°C)" : "Szobahő";
+    document.getElementById('k_res').innerHTML = `<p>Liszt: <span>${Math.round(600*scale)}g</span></p><p>Víz: <span>${Math.round(600*h*scale)}g</span></p><p>Kovász: <span>${Math.round(150*scale)}g</span></p><p>Krumpli: <span>${Math.round(pot*scale)}g</span></p><p>Só: <span>${Math.round(15*scale)}g</span></p><p>Hőm. javaslat: <span>${t_viz}</span></p><div class="total-box">Összesen: ${Math.round(w)}g</div>`;
     document.getElementById('k_res').style.display = 'block';
 }
 
 function calcKovaszolt() {
-    let w = parseFloat(document.getElementById('e_target').value);
-    let h = parseFloat(document.getElementById('e_hyd').value)/100;
-    let tL = (w - (w * (5.5/3600))) / (1 + h + 0.022);
-    document.getElementById('e_res').innerHTML = `
-        <div class="pre-box">ELŐTÉSZTA: 330g L | 330g V | 2g É</div>
-        <p>Liszt: <b>${Math.round(tL-330)} g</b></p>
-        <p>Víz: <b>${Math.round((tL*h)-330)} g</b></p>
-        <p>Élesztő: <b>${(w*(5.5/3600)-2).toFixed(2)} g</b></p>
-        <div class="total-box">Összesen: ${Math.round(w)}g</div>`;
+    let w = getN('e_target'), h = getN('e_hyd')/100, saltP = getN('e_salt')/100, pot = getN('e_pot');
+    let totalBase = 600 + (600*h) + pot + (600*saltP) + 8 + 6 + 4.5; 
+    let scale = w / totalBase;
+    let baseL = 600 * scale; 
+    let pL = baseL * 0.33;
+    document.getElementById('e_res').innerHTML = `<div class="pre-box">POOLISH: ${Math.round(pL)}g L | ${Math.round(pL)}g V | 2g Él</div><p>Liszt (maradék): <span>${Math.round(baseL - pL)}g</span></p><p>Víz (maradék): <span>${Math.round((baseL*h) - pL)}g</span></p><p>Krumpli: <span>${Math.round(pot*scale)}g</span></p><p>Só: <span>${Math.round(baseL*saltP)}g</span></p><p>Zsír: 8g | Cukor: 6g | Él: 2.5g</p><div class="total-box">Összesen: ${Math.round(w)}g</div>`;
     document.getElementById('e_res').style.display = 'block';
 }
 
 function calcPizza() {
-    let db = parseFloat(document.getElementById('p_db').value);
-    let s = parseFloat(document.getElementById('p_suly').value);
-    let w = db * s;
-    let h = 0.65; let sP = parseFloat(document.getElementById('p_salt').value)/100;
-    let tL = w / (1 + h + sP + 0.0034);
-    let pL = tL * 0.33; let tE = tL * 0.0034;
-    document.getElementById('p_res').innerHTML = `
-        <div class="pre-box">POOLISH: L: ${Math.round(pL)}g | V: ${Math.round(pL)}g</div>
-        <p>Liszt: <b>${Math.round(tL-pL)} g</b></p>
-        <p>Víz: <b>${Math.round((tL*h)-pL)} g</b></p>
-        <p>Élesztő: <b>${(tE - (tL*0.0025)).toFixed(2)} g</b></p>
-        <div class="total-box">Összesen: ${Math.round(w)}g</div>`;
+    let db = getN('p_db'), s = getN('p_suly'), saltP = getN('p_salt')/100, oil = getN('p_oil');
+    let totalW = db * s;
+    // Liszt számítás: (Összsúly - Olaj - Dagasztási élesztő) / (1 + Hidro + Só%)
+    let tL = (totalW - oil - 1) / (1 + 0.65 + saltP);
+    let pL = tL * 0.33;
+    document.getElementById('p_res').innerHTML = `<div class="pre-box">POOLISH: ${Math.round(pL)}g L | ${Math.round(pL)}g V | 2g Él</div><p>Liszt (maradék): <span>${Math.round(tL-pL)}g</span></p><p>Víz (maradék): <span>${Math.round((tL*0.65)-pL)}g</span></p><p>Só: <span>${Math.round(tL*saltP)}g</span></p><p>Olívaolaj: <span>${oil}g</span></p><p>Dagasztáshoz élesztő: <span>1g</span></p><div class="total-box">Összesen: ${Math.round(totalW)}g</div>`;
     document.getElementById('p_res').style.display = 'block';
 }
 
-window.onload = loadAll;
+function saveData() {
+    document.querySelectorAll('input:not([id^="l_"])').forEach(i => localStorage.setItem('v2_bakery_'+i.id, i.value));
+    localStorage.setItem('v2_bakery_kisokos', document.getElementById('kisokos_text').value);
+    localStorage.setItem('v2_bakery_links', JSON.stringify(links));
+    alert('Adatok elmentve!');
+}
+
+function loadData() {
+    document.querySelectorAll('input:not([id^="l_"])').forEach(i => {
+        let v = localStorage.getItem('v2_bakery_'+i.id); if(v) i.value = v;
+    });
+    let k = localStorage.getItem('v2_bakery_kisokos'); if(k) document.getElementById('kisokos_text').value = k;
+    renderLinks();
+}
+
+function addLink() {
+    let n = document.getElementById('l_name').value, u = document.getElementById('l_url').value;
+    if(n && u) { links.push({n, u: u.startsWith('http') ? u : 'https://' + u}); renderLinks(); }
+}
+
+function renderLinks() {
+    document.getElementById('link-list').innerHTML = links.map((l, i) => `<div class="link-item"><a href="${l.u}" target="_blank">📺 ${l.n}</a><span onclick="links.splice(${i},1);renderLinks()" style="color:red;font-weight:bold;cursor:pointer">X</span></div>`).join('');
+}
+window.onload = loadData;
 </script>
 </body>
 </html>
